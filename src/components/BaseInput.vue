@@ -1,58 +1,47 @@
 <template>
-  <label
-    v-if="label"
-    :for="uuid"
-  >
-    {{ label }}
-  </label>
+  <label :for="uuid">{{ label }}</label>
   <input
-    class="field"
+    :id="uuid"
+    :aria-invalid="error ? true : null"
     v-bind="{
       ...$attrs,
-      onInput: updateValue
+      onInput: handleInput
     }"
-    :id="uuid"
     :value="modelValue"
-    :placeholder="label"
     :aria-describedby="error ? `${uuid}-error` : null"
-    :aria-invalid="error ? true : false"
-    :class="{ error }"
-  >
-  <BaseErrorMessage
-    v-if="error"
-    :id="`${uuid}-error`"
-  >
-    {{ error }}
-  </BaseErrorMessage>
+  />
+  <p aria-live="assertive" :id="`${uuid}-error`" v-if="error" class="errorMessage">{{error}}</p>
 </template>
 
 <script>
-import SetupFormComponent from '@/features/SetupFormComponent'
-import UniqueID from '@/features/UniqueID'
-
+import UniqueID from '../features/UniqueID.js'
 export default {
   props: {
     label: {
       type: String,
       default: ''
     },
+    modelValue: {
+      type: [String, Number],
+      required: true
+    },
     error: {
       type: String,
       default: ''
-    },
-    modelValue: {
-      type: [String, Number],
-      default: ''
     }
   },
-  setup (props, context) {
-    const { updateValue } = SetupFormComponent(props, context)
+  setup (props, { emit }) {
+    const handleInput = (event) => {
+      emit('update:modelValue', event.target.value)
+    }
+
     const uuid = UniqueID().getID()
 
-    return {
-      updateValue,
-      uuid
-    }
+    return { handleInput, uuid }
   }
 }
 </script>
+
+<style>
+
+</style>

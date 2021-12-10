@@ -1,28 +1,20 @@
 <template>
   <input
-      type="radio"
-      v-bind="{ ...$attrs, onChange: updateValue }"
-      :checked="modelValue === value"
-      :id="uuid"
-    />
-  <label
-    v-if="label"
-    :for="uuid"
-  >
-    {{ label }}
-  </label>
-  <BaseErrorMessage
-    v-if="error"
-    :id="`${uuid}-error`"
-  >
-    {{ error }}
-  </BaseErrorMessage>
+    type="radio"
+    :checked="modelValue === value"
+    :value="value"
+    :id="uuid"
+    v-bind="{
+      ...$attrs,
+      onChange: handleRadioButtonChange
+    }"
+
+  />
+  <label :for="uuid">{{label}}</label>
 </template>
 
 <script>
-import UniqueID from '@/features/UniqueID'
-import SetupFormComponent from '@/features/SetupFormComponent'
-
+import UniqueID from '../features/UniqueID.js'
 export default {
   props: {
     label: {
@@ -30,24 +22,24 @@ export default {
       default: ''
     },
     modelValue: {
-      type: [String, Number]
+      type: [String, Number],
+      default: ''
     },
     value: {
-      type: [String, Number]
-    },
-    error: {
-      type: String,
-      default: ''
+      type: [String, Number],
+      required: true
     }
   },
-  setup (props, context) {
-    const uuid = UniqueID().getID()
-    const { updateValue } = SetupFormComponent(props, context)
-
-    return {
-      updateValue,
-      uuid
+  setup (props, { emit }) {
+    const handleRadioButtonChange = (event) => {
+      emit('update:modelValue', event.target.value)
     }
+    const uuid = UniqueID().getID()
+    return { handleRadioButtonChange, uuid }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+
+</style>

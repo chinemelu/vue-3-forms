@@ -1,69 +1,48 @@
 <template>
-  <label
-    v-if="label"
-    :for="uuid"
-  >
-    {{ label }}
-  </label>
-  <select
-    class="field"
-    v-bind="{
-      ...$attrs,
-      onChange: updateValue
-    }"
-    :value="modelValue"
-    :id="uuid"
-    :aria-describedby="error ? `${uuid}-error` : null"
-    :aria-invalid="error ? true : false"
-    :class="{ error }"
-  >
-    <option
-      v-for="option in options"
-      :value="option"
-      :key="option"
-      :selected="option === modelValue"
-    >
-      {{ option }}
-    </option>
-  </select>
-  <BaseErrorMessage
-    v-if="error"
-    :id="`${uuid}-error`"
-  >
-    {{ error }}
-  </BaseErrorMessage>
+   <label :for="uuid" v-if="label">{{ label }}</label>
+    <select :id="uuid" v-bind="{ ...$attrs, onChange: handleChange }" :value="modelValue">
+      <option disabled value="">{{defaultSelectText}}</option>
+      <option
+        v-for="(option, index) in options"
+        :value="option"
+        :key="index"
+        :selected="option === modelValue"
+      >{{ option }}</option>
+    </select>
 </template>
 
 <script>
-import SetupFormComponent from '@/features/SetupFormComponent'
-import UniqueID from '@/features/UniqueID'
-
+import UniqueID from '../features/UniqueID.js'
 export default {
   props: {
-    options: {
-      type: Array,
-      required: true
+    defaultSelectText: {
+      type: String,
+      default: 'Select'
     },
     label: {
       type: String,
       default: ''
     },
-    error: {
-      type: String,
-      default: ''
+    options: {
+      type: [Object, Array],
+      required: true
     },
     modelValue: {
-      type: [String, Number]
+      type: [String, Number],
+      default: ''
     }
   },
-  setup (props, context) {
-    const { updateValue } = SetupFormComponent(props, context)
-    const uuid = UniqueID().getID()
-
-    return {
-      updateValue,
-      uuid
+  setup (props, { emit }) {
+    const handleChange = (event) => {
+      emit('update:modelValue', event.target.value)
     }
+
+    const uuid = UniqueID().getID()
+    return { handleChange, uuid }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+
+</style>

@@ -1,85 +1,77 @@
 <template>
   <div>
     <h1>Create an event</h1>
-    <form>
-
-      <label>Select a category</label>
-      <select v-model="event.category">
-        <option
-          v-for="option in categories"
-          :value="option"
-          :key="option"
-          :selected="option === event.category"
-        >{{ option }}</option>
-      </select>
-
-      <h3>Name & describe your event</h3>
-
-      <label>Title</label>
-      <input
-        v-model="event.title"
-        type="text"
-        placeholder="Title"
-        class="field"
-      >
-
-      <label>Description</label>
-      <input
-        v-model="event.description"
-        type="text"
-        placeholder="Description"
+    <form @submit.prevent="sendForm">
+      <BaseSelect
+        :options="categories"
+        label="Select a category"
+        v-model="event.category"
         class="field"
       />
 
-      <h3>Where is your event?</h3>
+      <fieldset>
+        <legend>
+          Name & describe your event
+        </legend>
+        <BaseInput
+          class="field"
+          placeholder="Title"
+          v-model="event.title"
+          label="Title"
+          type="text"
+        />
 
-      <label>Location</label>
-      <input
+        <BaseInput
+          class="field"
+          placeholder="Description"
+          v-model="event.description"
+          type="text"
+          label="Description"
+        />
+      </fieldset>
+
+      <fieldset>
+      <legend>Where is your event?</legend>
+
+      <BaseInput
+        class="field"
+        placeholder="Description"
         v-model="event.location"
         type="text"
-        placeholder="Location"
-        class="field"
+        label="Location"
       />
+      </fieldset>
 
-      <h3>Are pets allowed?</h3>
-      <div>
-        <input
-            type="radio"
+      <fieldset>
+        <legend>Pets</legend>
+        <p>Are pets allowed?</p>
+        <div>
+          <BaseRadioGroup
             v-model="event.pets"
-            :value="1"
-            name="pets"
+            name="pet"
+            :options="radioButtonOptions"
           />
-        <label>Yes</label>
-      </div>
+        </div>
+      </fieldset>
 
-      <div>
-        <input
-          type="radio"
-          v-model="event.pets"
-          :value="0"
-          name="pets"
-        />
-        <label>No</label>
-      </div>
+      <fieldset>
+        <legend>Extras</legend>
+        <div>
+          <BaseCheckbox
+            v-model="event.extras.catering"
+            class="field"
+            label="Catering"
+          />
+        </div>
 
-      <h3>Extras</h3>
-      <div>
-        <input
-          type="checkbox"
-          v-model="event.extras.catering"
-          class="field"
-        />
-        <label>Catering</label>
-      </div>
-
-      <div>
-        <input
-          type="checkbox"
-          v-model="event.extras.music"
-          class="field"
-        />
-        <label>Live music</label>
-      </div>
+        <div>
+          <BaseCheckbox
+            v-model="event.extras.music"
+            class="field"
+            label="Live music"
+          />
+        </div>
+      </fieldset>
 
       <button type="submit">Submit</button>
     </form>
@@ -89,7 +81,22 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
+  methods: {
+    sendForm () {
+      axios.post(
+        'https://my-json-server.typicode.com/Code-Pop/Vue-3-Forms/events',
+        this.event
+      )
+        .then(function (response) {
+          console.log('Response', response)
+        })
+        .catch(function (err) {
+          console.log('Error', err)
+        })
+    }
+  },
   data () {
     return {
       categories: [
@@ -100,6 +107,16 @@ export default {
         'education',
         'food',
         'community'
+      ],
+      radioButtonOptions: [
+        {
+          label: 'Yes',
+          value: 1
+        },
+        {
+          label: 'No',
+          value: 0
+        }
       ],
       event: {
         category: '',
@@ -116,3 +133,17 @@ export default {
   }
 }
 </script>
+
+<style>
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+legend {
+  font-size: 28px;
+  font-weight: 700;
+  margin-top: 20px;
+}
+</style>
